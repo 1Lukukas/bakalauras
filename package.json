@@ -20,8 +20,11 @@
     "build:linux": "electron-vite build && electron-builder --linux --config"
   },
   "dependencies": {
-    "@electron-toolkit/preload": "^1.0.3",
-    "@electron-toolkit/utils": "^1.0.2"
+    "@electron-toolkit/preload": "1.0.3",
+    "@electron-toolkit/utils": "1.0.2",
+    "neo4j-driver": "5.7.0",
+    "sequelize": "6.31.0",
+    "tedious": "16.0.0"
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "^1.0.1",
