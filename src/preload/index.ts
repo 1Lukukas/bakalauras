@@ -1,8 +1,13 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  connectToSql: (args) => ipcRenderer.invoke('connect-sql', args),
+  connectToNeo4j: (args) => ipcRenderer.invoke('connect-neo4j', args),
+  createNodes: () => ipcRenderer.invoke('create-nodes'),
+  createRelationships: () => ipcRenderer.invoke('create-relationships')
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

@@ -1,7 +1,12 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { Sequelize } from 'sequelize'
+import neo4j, { Driver } from 'neo4j-driver'
+import getDatabase, { Database, Schema } from './utils/getSqlSchema'
+import { exportDatabaseData } from './utils/exportSqlData'
+import { createRelationships } from './utils/createRelationship'
 
 function createWindow(): void {
   // Create the browser window.
@@ -69,3 +74,29 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+let sequelize: Sequelize
+let neo4jDriver: Driver
+let database: Database
+
+ipcMain.handle('connect-sql', async (_event, credentials) => {
+  sequelize = new Sequelize(credentials.databaseName, credentials.username, credentials.password, {
+    host: credentials.host,
+    dialect: credentials.dialect
+  })
+  database = await getDatabase(sequelize)
+})
+
+ipcMain.handle('connect-neo4j', async (_event, credentials) => {
+  neo4jDriver = neo4j.driver(
+    credentials.uri,
+    neo4j.auth.basic(credentials.username, credentials.password)
+  )
+})
+
+ipcMain.handle('create-nodes', async (_event) => {
+  if (database) await exportDatabaseData(sequelize, neo4jDriver, database)
+})
+
+ipcMain.handle('create-relationships', async (_event) => {
+  if (database && neo4jDriver) await createRelationships(neo4jDriver, database)
+})
