@@ -1,7 +1,13 @@
-import Versions from './components/Versions'
-import icons from './assets/icons.svg'
+import { useContext } from 'react'
+import Graph from './components/Graph'
+import { Grid } from '@mui/material'
+import Menu from './components/Menu'
+import { Database } from 'src/types'
+import { MigrationContext } from './contexts/context'
 
 function App(): JSX.Element {
+  const { tableData, setTableData } = useContext(MigrationContext)
+
   const handleConnectToSql = async () => {
     const config = {
       host: 'localhost',
@@ -11,7 +17,12 @@ function App(): JSX.Element {
       dialect: 'mssql'
     }
 
-    await window.api.connectToSql(config)
+    try {
+      const database: Database = await window.api.connectToSql(config)
+      setTableData(database?.schemas.flatMap((s) => s.tables))
+    } catch (error) {
+      console.error('Error connecting to SQL server:', error)
+    }
   }
 
   const handleConnectToNeo4j = async () => {
@@ -169,10 +180,22 @@ function App(): JSX.Element {
   // )
   return (
     <>
-      <button onClick={handleConnectToSql}>Connect Sql</button>
-      <button onClick={handleConnectToNeo4j}>Connect Neo4j</button>
-      <button onClick={handleCreateNodes}>Create Nodes</button>
-      <button onClick={handleCreateRelationships}>Create Relationships</button>
+      <>
+        <button onClick={handleConnectToSql}>Connect Sql</button>
+        <button onClick={handleConnectToNeo4j}>Connect Neo4j</button>
+        <button onClick={handleCreateNodes}>Create Nodes</button>
+        <button onClick={handleCreateRelationships}>Create Relationships</button>
+      </>
+      {tableData.length > 0 && (
+        <Grid container spacing={3}>
+          <Grid item xs={5}>
+            <Menu />
+          </Grid>
+          <Grid item xs={7}>
+            <Graph />
+          </Grid>
+        </Grid>
+      )}
     </>
   )
 }

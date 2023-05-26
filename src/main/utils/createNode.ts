@@ -1,4 +1,4 @@
-import { Driver, Transaction } from 'neo4j-driver'
+import { Driver, Transaction, DateTime } from 'neo4j-driver'
 
 export const createNode = (
   transaction: Transaction,
@@ -7,7 +7,7 @@ export const createNode = (
 ) => {
   const props = Object.entries(columns).reduce((acc, [key, value]) => {
     if (value instanceof Date) {
-      acc[key] = value.toISOString()
+      acc[key] = DateTime.fromStandardDate(value)
     } else {
       acc[key] = value
     }
@@ -20,6 +20,26 @@ export const createNode = (
 }
 
 export const createNodesFromSQLRows = async (
+  driver: Driver,
+  label: string,
+  sqlRows: Record<string, any>[]
+) => {
+  const session = driver.session()
+  const transaction = session.beginTransaction()
+  try {
+    sqlRows.forEach((row) => {
+      createNode(transaction, label, row)
+    })
+    await transaction.commit()
+  } catch (error) {
+    await transaction.rollback()
+    console.log(`Error: ${error}`)
+  } finally {
+    session.close()
+  }
+}
+
+export const createRelationshipsFromSQLRows = async (
   driver: Driver,
   label: string,
   sqlRows: Record<string, any>[]

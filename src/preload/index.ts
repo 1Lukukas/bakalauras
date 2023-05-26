@@ -6,7 +6,10 @@ const api = {
   connectToSql: (args) => ipcRenderer.invoke('connect-sql', args),
   connectToNeo4j: (args) => ipcRenderer.invoke('connect-neo4j', args),
   createNodes: () => ipcRenderer.invoke('create-nodes'),
-  createRelationships: () => ipcRenderer.invoke('create-relationships')
+  createRelationships: () => ipcRenderer.invoke('create-relationships'),
+  onLogReceived: (callback) => ipcRenderer.on('log', (_event, data) => {
+    callback(data);
+  })
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

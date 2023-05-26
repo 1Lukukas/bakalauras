@@ -4,15 +4,17 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { Sequelize } from 'sequelize'
 import neo4j, { Driver } from 'neo4j-driver'
-import getDatabase, { Database, Schema } from './utils/getSqlSchema'
-import { exportDatabaseData } from './utils/exportSqlData'
+import getDatabase from './utils/getSqlSchema'
 import { createRelationships } from './utils/createRelationship'
+import { Database } from '../types'
+import { error } from 'console'
+import { exportDatabaseData } from './utils/exportSqlData'
 
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+  mainWindow = new BrowserWindow({
+    width: 1600,
+    height: 900,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -74,16 +76,20 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+let mainWindow: BrowserWindow
 let sequelize: Sequelize
 let neo4jDriver: Driver
 let database: Database
 
 ipcMain.handle('connect-sql', async (_event, credentials) => {
-  sequelize = new Sequelize(credentials.databaseName, credentials.username, credentials.password, {
-    host: credentials.host,
-    dialect: credentials.dialect
+  const { databaseName, username, password, host } = credentials
+  sequelize = new Sequelize(databaseName, username, password, {
+    host: host,
+    dialect: 'mssql'
   })
+  await sequelize.databaseVersion().then(()=>)
   database = await getDatabase(sequelize)
+  return database
 })
 
 ipcMain.handle('connect-neo4j', async (_event, credentials) => {
@@ -91,12 +97,23 @@ ipcMain.handle('connect-neo4j', async (_event, credentials) => {
     credentials.uri,
     neo4j.auth.basic(credentials.username, credentials.password)
   )
+
+  return await neo4jDriver.getServerInfo()
 })
 
 ipcMain.handle('create-nodes', async (_event) => {
-  if (database) await exportDatabaseData(sequelize, neo4jDriver, database)
+  if (database) {
+    return await exportDatabaseData(sequelize, neo4jDriver, database)
+  } else {
+    throw error('no databse')
+  }
 })
 
 ipcMain.handle('create-relationships', async (_event) => {
   if (database && neo4jDriver) await createRelationships(neo4jDriver, database)
+})
+
+ipcMain.on('send-string', (event, arg) => {
+  // Send a 'string-received' message back to the renderer process
+  event.sender.send('string-received', `Received string: ${arg}`)
 })

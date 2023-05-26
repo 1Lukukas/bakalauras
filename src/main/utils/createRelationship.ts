@@ -1,5 +1,6 @@
 import { Driver, Integer, int } from 'neo4j-driver'
-import { Database, Table } from './getSqlSchema'
+import { Database, Table } from '../../types'
+import { logToRenderer } from './logToRenderer'
 
 async function countNodesByLabel(driver: Driver, nodeLabel: string) {
   const session = driver.session()
@@ -16,15 +17,16 @@ async function countNodesByLabel(driver: Driver, nodeLabel: string) {
   return count
 }
 
-async function createRelationshipInBatches(
+export const createRelationshipInBatches = async (
   driver: Driver,
   fromNodeLabel: string,
   toNodeLabel: string,
   property1: string,
   property2: string,
   relationshipType: string,
-  batchSize: Integer
-) {
+  batchSize: Integer,
+  props?: Record<string, any>
+) => {
   const session = driver.session()
 
   const count = await countNodesByLabel(driver, fromNodeLabel)
@@ -32,6 +34,9 @@ async function createRelationshipInBatches(
   console.log(
     `Creating ${relationshipType} relationships between ${fromNodeLabel} and ${toNodeLabel}`
   )
+  // logToRenderer(
+  //   `Creating ${relationshipType} relationships between ${fromNodeLabel} and ${toNodeLabel}`
+  // )
 
   let processedCount = 0
   let lastId: Integer = int(0)
@@ -42,17 +47,22 @@ async function createRelationshipInBatches(
       WITH n1, n2
       ORDER BY ID(n1)
       LIMIT ${batchSize}
-      CREATE (n1)-[:${relationshipType}]->(n2)
+      CREATE (n1)-[r:${relationshipType} ${props ? '$props' : ''}]->(n2)
       RETURN count(*) as count, MAX(ID(n1)) as lastId`
 
-    const result = await session.run(query, { lastId })
+    const result = await session.run(query, { lastId, props })
     const batchCount = result.records[0].get('count').toNumber()
+
     lastId = result.records[0].get('lastId')
 
     processedCount += batchCount
+    if (batchCount === 0) break
   }
 
-  console.log(`Finished creating ${processedCount} ${relationshipType} relationships`)
+  console.log(
+    `Creating ${relationshipType} relationships between ${fromNodeLabel} and ${toNodeLabel}`
+  )
+  logToRenderer(`Created ${processedCount} ${relationshipType} relationships`)
 
   session.close()
 }
@@ -80,13 +90,13 @@ function removeColumnsWithoutForeignKey(table: Table): Table {
 export const createRelationships = async (driver: Driver, database: Database) => {
   const tables = database.schemas
     .flatMap((s) => s.tables)
-    .map((t) => removeColumnsWithoutForeignKey(t))
-    .map((t) => removeNonForeignKeyConstraints(t))
+    .map(removeColumnsWithoutForeignKey)
+    .map(removeNonForeignKeyConstraints)
 
   for (const table of tables) {
     for (const column of table.columns) {
       const constraint = column.constraints?.[0]
-      if (constraint?.type === 'FOREIGN KEY') {
+      if (constraint && 'shouldExportFK' in constraint && constraint.shouldExportFK) {
         const { referencedTableName, referencedColumnName } = constraint
         const relationshipName = `${table.name}_${referencedTableName}`
         await createRelationshipInBatches(
@@ -101,4 +111,6 @@ export const createRelationships = async (driver: Driver, database: Database) =>
       }
     }
   }
+
+  logToRenderer('Migration finished')
 }
