@@ -4,26 +4,6 @@ import { set } from 'lodash'
 import MaterialReactTable from 'material-react-table'
 import { ChangeEvent, useContext } from 'react'
 
-// function removeNonForeignKeyConstraints(table: Table) {
-//   const columnsWithForeignKeyConstraints = table.columns.map((column) => {
-//     const foreignKeyConstraints = column.constraints?.filter(
-//       (constraint) => constraint.type === 'FOREIGN KEY'
-//     )
-//     return { ...column, constraints: foreignKeyConstraints }
-//   })
-//   return { ...table, columns: columnsWithForeignKeyConstraints }
-// }
-
-// function removeColumnsWithoutForeignKey(table: Table) {
-//   const columnsWithForeignKey = table.columns.filter((column) => {
-//     return column.constraints?.some((constraint) => constraint.type === 'FOREIGN KEY')
-//   })
-//   return {
-//     ...table,
-//     columns: columnsWithForeignKey
-//   }
-// }
-
 const RelationshipsTable = () => {
   const { edgeData, setEdgeData } = useContext(MigrationContext)
 

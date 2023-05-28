@@ -11,15 +11,15 @@ export const createRelationshipsHandler = async (
   database: Database,
   edges: Edge[]
 ) => {
-  // start transaction here?
-  const edgesWithProperties = edges.filter((edge) => edge.hasProperties)
-  const edgesWithoutProperties = edges.filter((edge) => !edge.hasProperties)
+  const exportedEdges = edges.filter((edge) => edge.shouldBeExported)
+  const edgesWithProperties = exportedEdges.filter((edge) => edge.hasProperties)
+  const edgesWithoutProperties = exportedEdges.filter((edge) => !edge.hasProperties)
 
   for (const edge of edgesWithProperties) {
     const schema = database.schemas.find((s) => s.tables.find((t) => t.name === edge.tableName))
     const table = schema?.tables.find((t) => t.name === edge.tableName)
     if (table && schema) {
-      await createRelationshipsFromSqlRows(sequelize, driver, table, schema?.name, 4000, edge)
+      await createRelationshipsFromSqlRows(sequelize, driver, table, schema?.name, edge, 1000)
     } else {
       console.log(`table or schema not found for edge ${edge.data.label}`)
     }
@@ -28,8 +28,8 @@ export const createRelationshipsHandler = async (
   for (const edge of edgesWithoutProperties) {
     await createRelationshipsInBatches(
       driver,
-      edge.data.source,
-      edge.data.target,
+      edge.sourceLabel,
+      edge.targetLabel,
       edge.FkSourceColumnName,
       edge.FkTargetColumnName!,
       edge.data.label,

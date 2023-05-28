@@ -10,8 +10,8 @@ function MigrationPage(): JSX.Element {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const handleMigration = async () => {
-    await window.api.createNodes2(nodeData)
-    await window.api.createRelationships2(edgeData)
+    await window.api.createNodes(nodeData)
+    await window.api.createRelationships(edgeData)
     setMigrationCompleted(true)
   }
 

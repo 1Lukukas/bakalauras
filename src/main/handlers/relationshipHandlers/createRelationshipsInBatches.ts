@@ -23,18 +23,11 @@ export const createRelationshipsInBatches = async (
   property1: string,
   property2: string,
   relationshipType: string,
-  batchSize: Integer,
+  batchSize: Integer
 ) => {
   const session = driver.session()
 
   const count = await countNodesByLabel(driver, fromNodeLabel)
-
-  console.log(
-    `Creating ${relationshipType} relationships between ${fromNodeLabel} and ${toNodeLabel}`
-  )
-  // logToRenderer(
-  //   `Creating ${relationshipType} relationships between ${fromNodeLabel} and ${toNodeLabel}`
-  // )
 
   let processedCount = 0
   let lastId: Integer = int(0)
@@ -57,9 +50,6 @@ export const createRelationshipsInBatches = async (
     if (batchCount === 0) break
   }
 
-  console.log(
-    `Creating ${relationshipType} relationships between ${fromNodeLabel} and ${toNodeLabel}`
-  )
   logToRenderer(`Created ${processedCount} ${relationshipType} relationships`)
 
   session.close()

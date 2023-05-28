@@ -5,13 +5,13 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   connectToSql: (args) => ipcRenderer.invoke('connect-sql', args),
   connectToNeo4j: (args) => ipcRenderer.invoke('connect-neo4j', args),
-  createNodes: () => ipcRenderer.invoke('create-nodes'),
-  createRelationships: () => ipcRenderer.invoke('create-relationships'),
-  createNodes2: (args) => ipcRenderer.invoke('create-nodes2', args),
-  createRelationships2: (args) => ipcRenderer.invoke('create-relationships2', args),
-  onLogReceived: (callback) => ipcRenderer.on('log', (_event, data) => {
-    callback(data);
-  })
+  getSchema: () => ipcRenderer.invoke('get-schema'),
+  createNodes: (args) => ipcRenderer.invoke('create-nodes', args),
+  createRelationships: (args) => ipcRenderer.invoke('create-relationships', args),
+  onLogReceived: (callback) =>
+    ipcRenderer.on('log', (_event, data) => {
+      callback(data)
+    })
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -8,11 +8,10 @@ declare global {
     api: {
       connectToSql: (args: any) => Promise<any>
       connectToNeo4j: (args: any) => Promise<any>
-      createNodes: () => Promise<any>
-      createRelationships: () => Promise<any>
+      getSchema: () => Promise<any>
+      createNodes: (nodes: Node[]) => Promise<any>
+      createRelationships: (edges: Edge[]) => Promise<any>
       onLogReceived: (callback: (data: string) => void) => void
-      createNodes2: (nodes: Node[]) => Promise<any>
-      createRelationships2: (edges: Edge[]) => Promise<any>
     }
   }
 }

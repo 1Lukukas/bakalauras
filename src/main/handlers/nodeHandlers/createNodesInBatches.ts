@@ -16,6 +16,7 @@ export const createNodesInBatches = async (
   driver: Driver,
   table: Table,
   schemaName: string,
+  nodeLabel: string,
   batchSize: number
 ) => {
   const primaryKey = findPrimaryKeyColumn(table)
@@ -34,7 +35,7 @@ export const createNodesInBatches = async (
     `
     const result = await sequelize.query(query, { type: QueryTypes.SELECT, raw: true })
 
-    await createNodesFromSQLRows(driver, table.name, result)
+    await createNodesFromSQLRows(driver, nodeLabel, result)
 
     if (result.length < batchSize) {
       shouldExportBatch = false

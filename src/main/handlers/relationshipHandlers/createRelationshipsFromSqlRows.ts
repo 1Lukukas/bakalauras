@@ -10,8 +10,8 @@ export const createRelationshipsFromSqlRows = async (
   driver: Driver,
   table: Table,
   schemaName: string,
-  batchSize: number,
-  edge: Edge
+  edge: Edge,
+  batchSize: number
 ) => {
   const primaryKey = findPrimaryKeyColumn(table)
   const columns = table.columns.map((c) => `[${c.name}]`).join(',')
@@ -31,8 +31,8 @@ export const createRelationshipsFromSqlRows = async (
 
     await createRelationshipsWithProperties(
       driver,
-      edge.data.source,
-      edge.data.target,
+      edge.sourceLabel,
+      edge.targetLabel,
       edge.FkSourceColumnName,
       edge.FkTargetColumnName,
       edge.data.label,

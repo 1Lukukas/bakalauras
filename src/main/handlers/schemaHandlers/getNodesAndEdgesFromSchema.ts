@@ -68,6 +68,8 @@ const getNodesAndEdgesFromSchema = (tables: Table[]) => {
             },
             FkSourceColumnName: column.name,
             FkTargetColumnName: foreignKeyConstraint.referencedColumnName,
+            sourceLabel: table.name,
+            targetLabel: foreignKeyConstraint.referencedTableName,
             shouldBeExported: true,
             hasProperties: false
           }
@@ -102,7 +104,8 @@ const getNodesAndEdgesFromSchema = (tables: Table[]) => {
           },
           FkSourceColumnName: fk1.referencedColumnName,
           FkTargetColumnName: fk2.referencedColumnName,
-
+          sourceLabel: fk1.referencedTableName,
+          targetLabel: fk2.referencedTableName,
           shouldBeExported: true,
           hasProperties: true,
           tableName: name

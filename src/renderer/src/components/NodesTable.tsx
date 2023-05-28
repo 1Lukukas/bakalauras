@@ -28,9 +28,21 @@ const NodesTable = () => {
   const handleSaveCell = (cell, value: string) => {
     const { index } = cell.row
     const updatedNodeData = [...nodeData]
+    const updatedEdgeData = [...edgeData]
+
+    updatedEdgeData.forEach((edge) => {
+      if (edge.data.source === updatedNodeData[index].data.label) {
+        edge.sourceLabel = value
+      }
+      if (edge.data.target === updatedNodeData[index].data.label) {
+        edge.targetLabel = value
+        console.log(value)
+      }
+    })
 
     set(updatedNodeData[index], cell.column.id, value)
 
+    setEdgeData(updatedEdgeData)
     setNodeData([...updatedNodeData])
   }
 

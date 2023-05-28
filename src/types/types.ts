@@ -1,4 +1,4 @@
-import { ConstraintType } from '@enums'
+import { ConstraintType } from './enums'
 
 export interface Constraint {
   type: ConstraintType
@@ -50,6 +50,8 @@ export interface Edge {
   }
   shouldBeExported: boolean
   hasProperties: boolean
+  sourceLabel: string
+  targetLabel: string
   FkSourceColumnName: string
   FkTargetColumnName: string
   tableName?: string
