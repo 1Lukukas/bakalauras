@@ -3,7 +3,7 @@ import CytoscapeComponent from 'react-cytoscapejs'
 import fcose, { FcoseLayoutOptions } from 'cytoscape-fcose'
 import { useContext, useEffect, useState } from 'react'
 import { Edge, Node } from 'src/types'
-import { MigrationContext } from '@renderer/contexts/context'
+import { MigrationContext } from '@renderer/contexts/MigrationContext'
 
 cytoscape.use(fcose)
 

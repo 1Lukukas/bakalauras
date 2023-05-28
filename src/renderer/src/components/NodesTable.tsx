@@ -1,5 +1,5 @@
 import { Checkbox } from '@mui/material'
-import { MigrationContext } from '@renderer/contexts/context'
+import { MigrationContext } from '@renderer/contexts/MigrationContext'
 import MaterialReactTable from 'material-react-table'
 import { ChangeEvent, useContext } from 'react'
 import { set } from 'lodash'

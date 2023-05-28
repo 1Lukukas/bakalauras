@@ -7,6 +7,8 @@ const api = {
   connectToNeo4j: (args) => ipcRenderer.invoke('connect-neo4j', args),
   createNodes: () => ipcRenderer.invoke('create-nodes'),
   createRelationships: () => ipcRenderer.invoke('create-relationships'),
+  createNodes2: (args) => ipcRenderer.invoke('create-nodes2', args),
+  createRelationships2: (args) => ipcRenderer.invoke('create-relationships2', args),
   onLogReceived: (callback) => ipcRenderer.on('log', (_event, data) => {
     callback(data);
   })

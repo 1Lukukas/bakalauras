@@ -1,16 +1,17 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { Box, Grid, Paper } from '@mui/material'
 import Log from '@renderer/components/Log'
-import { useNavigate } from 'react-router-dom'
+import { MigrationContext } from '@renderer/contexts/MigrationContext'
 
 function MigrationPage(): JSX.Element {
+  const { nodeData, edgeData } = useContext(MigrationContext)
   const [migrationLog, setMigrationLog] = useState<string[]>([])
   const [migrationCompleted, setMigrationCompleted] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const handleMigration = async () => {
-    await window.api.createNodes()
-    await window.api.createRelationships()
+    await window.api.createNodes2(nodeData)
+    await window.api.createRelationships2(edgeData)
     setMigrationCompleted(true)
   }
 
@@ -24,7 +25,7 @@ function MigrationPage(): JSX.Element {
     }
   }, [migrationLog])
 
-  window.api.onLogReceived((log: string) => {
+  window.api.onLogReceived((log) => {
     setMigrationLog([...migrationLog, log])
   })
 

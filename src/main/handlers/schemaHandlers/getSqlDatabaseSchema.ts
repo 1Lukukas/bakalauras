@@ -1,10 +1,9 @@
-import { QueryTypes, Sequelize } from 'sequelize'
-import { Database, Node } from '../../types'
-import { ConstraintType } from '../../types/enums'
-import { Constraint, ForeignKeyConstraint } from '../../types/types'
-import { logToRenderer } from './logToRenderer'
+import { Sequelize, QueryTypes } from 'sequelize'
+import { Database, Constraint, ForeignKeyConstraint } from '../../../types'
+import { ConstraintType } from '../../../types/enums'
+import { logToRenderer } from '../../utils/logToRenderer'
 
-interface getDatabaseQueryResult {
+interface getSqlDatabaseSchemaQueryResult {
   TABLE_SCHEMA: string
   TABLE_NAME: string
   COLUMN_NAME: string
@@ -16,7 +15,7 @@ interface getDatabaseQueryResult {
   REFERENCED_COLUMN_NAME: string
 }
 
-const getDatabaseQuery = `
+const getSqlDatabaseSchemaQuery = `
   SELECT
     C.TABLE_SCHEMA,
     C.TABLE_NAME,
@@ -54,10 +53,13 @@ const getDatabaseQuery = `
     C.ORDINAL_POSITION;
 `
 
-async function getDatabase(sequelize: Sequelize) {
-  const results = await sequelize.query<getDatabaseQueryResult>(getDatabaseQuery, {
-    type: QueryTypes.SELECT
-  })
+async function getSqlDatabaseSchema(sequelize: Sequelize) {
+  const results = await sequelize.query<getSqlDatabaseSchemaQueryResult>(
+    getSqlDatabaseSchemaQuery,
+    {
+      type: QueryTypes.SELECT
+    }
+  )
 
   const database: Database = { schemas: [] }
 
@@ -90,7 +92,7 @@ async function getDatabase(sequelize: Sequelize) {
     if (!column) {
       column = {
         name: COLUMN_NAME,
-        dataType: DATA_TYPE === 'xml' ? 'nvarchar(max)' : DATA_TYPE,
+        dataType: DATA_TYPE,
         isNullable: IS_NULLABLE === 'YES'
       }
       table.columns.push(column)
@@ -111,38 +113,8 @@ async function getDatabase(sequelize: Sequelize) {
     }
   })
 
-  // console.log('SQL Server database schema import complete')
-
-  // const [a, b] = getTablesByForeignKeyCount(database)
   logToRenderer('SQL Server database schema import complete')
   return database
 }
 
-// function getTablesByForeignKeyCount(database: Database): [Table[], Table[]] {
-//   const tablesWithTwoForeignKeys: Table[] = []
-//   const tablesWithoutTwoForeignKeys: Table[] = []
-
-//   for (const schema of database.schemas) {
-//     for (const table of schema.tables) {
-//       const foreignKeyCount = table.columns.reduce((count, column) => {
-//         if (column.constraints) {
-//           for (const constraint of column.constraints) {
-//             if (constraint.type === 'FOREIGN_KEY') {
-//               count++
-//             }
-//           }
-//         }
-//         return count
-//       }, 0)
-
-//       if (foreignKeyCount === 2) {
-//         tablesWithTwoForeignKeys.push(table)
-//       } else {
-//         tablesWithoutTwoForeignKeys.push(table)
-//       }
-//     }
-//   }
-
-//   return [tablesWithTwoForeignKeys, tablesWithoutTwoForeignKeys]
-// }
-export default getDatabase
+export default getSqlDatabaseSchema

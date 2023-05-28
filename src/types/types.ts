@@ -50,4 +50,8 @@ export interface Edge {
   }
   shouldBeExported: boolean
   hasProperties: boolean
+  FkSourceColumnName: string
+  FkTargetColumnName: string
+  tableName?: string
+  schemaName?: string
 }

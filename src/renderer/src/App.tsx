@@ -3,7 +3,7 @@ import Graph from './components/Graph'
 import { Grid } from '@mui/material'
 import Menu from './components/Menu'
 import { Database } from 'src/types'
-import { MigrationContext } from './contexts/context'
+import { MigrationContext } from './contexts/MigrationContext'
 
 function App(): JSX.Element {
   const { tableData, setTableData } = useContext(MigrationContext)

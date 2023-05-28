@@ -1,6 +1,6 @@
 import { ConstraintType } from '@enums'
 import { Paper } from '@mui/material'
-import { MigrationContext } from '@renderer/contexts/context'
+import { MigrationContext } from '@renderer/contexts/MigrationContext'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Database, Table } from 'src/types'

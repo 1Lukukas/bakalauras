@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './assets/index.css'
-import { MigrationContextProvider } from './contexts/context'
+import { MigrationContextProvider } from './contexts/MigrationContext'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ConnectionPage from './pages/ConnectionPage'
 import MigrationPage from './pages/MigrationPage'

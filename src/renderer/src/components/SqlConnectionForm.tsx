@@ -1,10 +1,9 @@
 import { useContext, useState } from 'react'
 import { TextField, Button, Grid, Snackbar, Alert } from '@mui/material'
-import { MigrationContext } from '@renderer/contexts/context'
-import { Database } from 'src/types'
+import { MigrationContext } from '@renderer/contexts/MigrationContext'
 
 const SqlConnectionForm = () => {
-  const { setTableData } = useContext(MigrationContext)
+  const { setEdgeData, setNodeData } = useContext(MigrationContext)
   const [isConnected, setIsConnected] = useState(false)
   const [formValues, setFormValues] = useState({
     host: 'localhost',
@@ -30,9 +29,10 @@ const SqlConnectionForm = () => {
     password: string
   }) => {
     try {
-      const database: Database = await window.api.connectToSql(dbConfig)
       setIsConnected(true)
-      setTableData(database?.schemas.flatMap((s) => s.tables))
+      const { nodes, edges } = await window.api.connectToSql(dbConfig)
+      setNodeData(nodes)
+      setEdgeData(edges)
     } catch (error) {
       console.error('Error connecting to SQL server:', error)
     }
